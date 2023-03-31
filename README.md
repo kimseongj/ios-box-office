@@ -77,7 +77,7 @@ BoxOffice
 ## 4. 실행화면
 |BoxOfficeList 페이지|MovieDetail페이지|
 |:----:|:----:|
-|<img src="https://i.imgur.com/JZXjcNx.gif" width = 80% /> |<img src = "https://i.imgur.com/VuWZ8Et.gif" width = 80% />|
+|<img src="https://i.imgur.com/JZXjcNx.gif" width = 70% /> |<img src = "https://i.imgur.com/d3Xrhvu.gif" width = 70%>|
 |BoxOfficeAPI를 JSON파싱해 원하는 날짜의 영화리스트를 `collectionListView`로 띄워주고 있는 화면입니다|BoxOfficeList페이지에서 각각의 셀을 클릭하여 해당하는 영화의 이미지와 영화정보를 화면에 띄워주는 화면입니다|
 
 
