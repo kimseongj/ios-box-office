@@ -5,21 +5,29 @@
 ---
 ## 목차 📋
 1. [팀원 소개](#1-팀원-소개)
-2. [타임 라인](#2-타임라인-230306--230310)
+2. [타임라인](#2-타임라인)
 3. [파일 구조](#3-파일-구조)
 4. [실행화면](#4-실행화면)
 5. [트러블 슈팅](#5-트러블-슈팅)
 6. [Reference](#6-reference)
 
 ---
+
+</br>
+
 ## 1. 팀원 소개
 |Goat|songjun|
 |:---:|:---:|
 |<img src="https://i.imgur.com/yoWVC56.png" width="140" height="140"/>|<img src="https://i.imgur.com/9Bd6NIT.png" width="140">|
 |[github]( https://github.com/Goatt8)|[github](https://github.com/kimseongj)|
 
+</br>
 
-## 2. 타임라인 (23.03.20 ~ 23.03.31)
+## 2. 타임라인
+
+<details>
+    <summary><big>타임라인</big></summary>
+    
 |날짜|진행 내용|
 |---|---|
 |2023-03-20|BoxOfficeResult JSON데이터모델, BoxOfficeParser구현|
@@ -32,6 +40,16 @@
 |2023-03-29|Provider 구현|
 |2023-03-30|오토레이아웃 구현 및  movieDetail 파싱된 데이터 view와 연결구현|
 |2023-03-31|Endpoint 모델 protocol로 채택후 각 데이터모델 구조체로 구현|
+|2023-04-03|MovieDetailViewController ImageSearch 데이터모델 구현|
+|2023-04-04|EndPoint String 모델 제거하고 각각 구조체에 String value 할당|
+|2023-04-05|BoxOfficeService 구현, CalenderView에서 받아온 날짜데이터 format변경|
+|2023-04-06|날짜선택 제한구현, setCalenderViewSelectionBehavior구현|
+|2023-04-07|날짜 format변경방식 String Extension에서 DateFormatter사용하는방식으로 변경|
+    
+</details>
+
+</br>
+    
 ## 3. 파일 구조
 
 <details>
@@ -46,22 +64,29 @@ BoxOffice
     ├── Model
     │      ├── DailyBoxOffice
     │      ├── MovieDetail
-    │      ├── DaumImageSearch
-    │      └── parser
+    │      ├── ImageSearch
+    │      ├── BoxOfficeService
+    │      └── ImageSearchService
     ├── NetWork
     │      ├── EndPointMakeable
     │      ├── MovieDetailEndpoint
     │      ├── DailyBoxOfficeEndpoint
+    │      ├── ImageSearchEndPoint
+    │      ├── parser
     │      ├── HTTPMethod
     │      └── Provider
     ├── View
     │      ├── Main
     │      ├── BoxOfficeListCell
+    │      ├── CalendarView
     │      └── MovieDetailView
     ├── Controller
     │      ├── MovieDetailViewController
+    │      ├── CalendarViewController
     │      └── BoxOfficeViewController
     ├── Extension
+    │      ├── String+Extension
+    │      ├── Int+Extension
     │      └── NSMutableAttributedString + Extesion
     ├── Assests
     ├── LaunchScreen
@@ -69,22 +94,17 @@ BoxOffice
           └── BoxOfficeTests
 ```
 
-<br>    
-    
 </details>
+    
 <br/>
 
 ## 4. 실행화면
-|BoxOfficeList 페이지|MovieDetail페이지|
-|:----:|:----:|
-|<img src="https://i.imgur.com/JZXjcNx.gif" width = 70% /> |<img src = "https://i.imgur.com/d3Xrhvu.gif" width = 70%>|
-|BoxOfficeAPI를 JSON파싱해 원하는 날짜의 영화리스트를 `collectionListView`로 띄워주고 있는 화면입니다|BoxOfficeList페이지에서 각각의 셀을 클릭하여 해당하는 영화의 이미지와 영화정보를 화면에 띄워주는 화면입니다|
+|BoxOfficeList 페이지|MovieDetail페이지|CalendarView|
+|:----:|:----:|:----:|
+|<img src="https://i.imgur.com/JZXjcNx.gif" width = 70% /> |<img src = "https://i.imgur.com/d3Xrhvu.gif" width = 70%>|<img src = "https://i.imgur.com/CP5uwZ0.gif" width = 70%>|
+|BoxOfficeAPI를 JSON파싱해 원하는 날짜의 영화리스트를 `collectionListView`로 띄워주고 있는 화면입니다|BoxOfficeList페이지에서 각각의 셀을 클릭하여 `MovieDetailView`로 이동해 해당하는 영화의 이미지와 영화정보를 화면에 띄워주는 화면입니다|우측상단 네비게이션바버튼을 이용해 날짜버튼을 클릭시 `calendarView`가 나오고 받아온 날짜데이터를 통해 BoxOfficeList를 다시 업데이트하는 화면입니다| 
 
-
-
-
-
-</details>
+</br>
 
 ## 5. 트러블 슈팅
 
@@ -211,6 +231,9 @@ extension NSMutableAttributedString {
 <img src = "https://i.imgur.com/14YUXZE.png">
 
 <img src = "https://i.imgur.com/oMfahD4.png" width = 40%, height = 40% >
+
+<br/>    
+    
 iOS 14.0부터 적용 가능한 Modern CollectionView를 사용하기 위해 위와같이 [ item - group - section ] 형식의 레이아웃을 적용했습니다.
 
 ```swift
@@ -226,7 +249,7 @@ setUpCompositionalLayout() -> UICollectionViewLayout {
 </details>    
     
 <details>
-    <summary><big>CollectionViewListCell - ios14.0 에러</big></summary>     
+    <summary><big>CollectionViewListCell - ios14.0 에러</big></summary>     
         
 ### :fire: CollectionViewListCell - ios14.0에러 
 
@@ -241,7 +264,7 @@ setUpCompositionalLayout() -> UICollectionViewLayout {
 </details>  
     
 <details>
-    <summary><big>URLSession Network Layer 구현 Endpoint - Provider </big></summary>      
+    <summary><big>URLSession Network Layer 구현 Endpoint - Provider </big></summary>      
         
 ### :fire: URLSession Network Layer 구현
 - URLSession을 사용하여 Endpoint와 Provider를 구현하기 위해 많은 코드적 실험을 했던것 같습니다.
@@ -321,13 +344,98 @@ struct MovieDetailEndpoint: EndpointMakeable {
     var queryItems: [URLQueryItem] = [URLQueryItem(name: "key", value: "f5eef3421c602c6cb7ea224104795888")]
 
 ```
+</details>
+
+<details>
+    <summary><big>ViewController의 역할을 줄여주기 위해 Service 모델 구현 </big></summary>
+    
+    ### :fire: ViewController의 역할을 줄여주기 위해 `BoxOfficeService`와 `ImageSearchService` 클래스 구현
+- URLSession을 통해 요청된 데이터를 ViewController에서 저장하지 않기 위해 `Service`라는 새로운 모델을 만들어줬습니다.
+    
+- 수정 전
+    - `Service`라는 모델을 만들기 전에는 ViewController에 GET을 통해 받아온 데이터를 직접 저장했습니다.
+    - ViewController에서 `Provider`의 메서드를 호출하여 데이터를 응답받고, ViewController 내부 프로퍼티에 저장하는 형태입니다.
+```swift
+final class BoxOfficeViewController: UIViewController {
+    @IBOutlet weak var boxOfficeListCollectionView: UICollectionView!
+    lazy var activityIndicator = UIActivityIndicatorView()
+
+    private var dailyBoxOffice: DailyBoxOffice?
+    private var provider = Provider()
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        fetchDailyBoxOfficeAPI()
+        setUpView()
+    }
+
+    private func fetchDailyBoxOfficeAPI() {
+        var dailyBoxOfficeEndpoint = DailyBoxOfficeEndpoint()
+        dailyBoxOfficeEndpoint.insertDateQueryValue(date: "20230327")
+
+        provider.loadBoxOfficeAPI(endpoint: dailyBoxOfficeEndpoint,
+                                  parser: Parser<DailyBoxOffice>()) { parsedData in
+            self.dailyBoxOffice = parsedData
+
+            DispatchQueue.main.async {
+                self.boxOfficeListCollectionView.reloadData()
+                self.activityIndicator.stopAnimating()
+            }
+        }
+    }
+}
+```
+
+- 수정 후  
+     - `Service`모델을 만든 이후에는 ViewController에서 `Service`모델을 통해 데이터를 불러오는 방식으로 변경되었습니다. 
+```swift
+// Service
+class BoxOfficeService {
+    let provider = Provider()
+    var dailyBoxOffice: DailyBoxOffice?
+    var movieDetail: MovieDetail?
+    var movieCode = ""
+    
+    func fetchDailyBoxOfficeAPI(date: String,completion: @escaping () -> Void) {
+        var dailyBoxOfficeEndpoint = DailyBoxOfficeEndpoint()
+        dailyBoxOfficeEndpoint.insertDateQueryValue(date: date)
         
-</details> 
+        provider.loadBoxOfficeAPI(endpoint: dailyBoxOfficeEndpoint,
+                                  parser: Parser<DailyBoxOffice>()) { parsedData in
+            self.dailyBoxOffice = parsedData
+            completion()
+        }
+    }
+    ...
+}
+    
+// ViewController
+final class BoxOfficeViewController: UIViewController {
+    @IBOutlet weak var boxOfficeListCollectionView: UICollectionView!
+    lazy var activityIndicator = UIActivityIndicatorView()
+    let boxOfficeService = BoxOfficeService()
+    private var provider = Provider()
 
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        fetchDailyBoxOffice()
+        setUpView()
+    }
 
+    private func fetchDailyBoxOffice() {
+        boxOfficeService.fetchDailyBoxOfficeAPI() {
+            DispatchQueue.main.async {
+                self.boxOfficeListCollectionView.reloadData()
+                self.activityIndicator.stopAnimating()
+```
+ 
+</details>
+    
+    
 ## 6. Reference
-[Swift Language Guide - URLSession](https://developer.apple.com/documentation/foundation/urlsession)<br />
-[Swift Language Guide - Fetching Website Data into Memory](https://developer.apple.com/documentation/foundation/url_loading_system/fetching_website_data_into_memory)<br />
-[Swift Document - ModernCollectionView](https://developer.apple.com/documentation/uikit/views_and_controls/collection_views/implementing_modern_collection_views)<br />
-[Swift Document - Lists in UICollectionView](https://developer.apple.com/videos/play/wwdc2020/10026)<br />   
-[Swift 김종권님 블로그 - NetWorkLyer - Endpoint, Provier 설계](https://ios-development.tistory.com/719)
+- [Swift Language Guide - URLSession](https://developer.apple.com/documentation/foundation/urlsession)
+- [Swift Language Guide - Fetching Website Data into Memory](https://developer.apple.com/documentation/foundation/url_loading_system/fetching_website_data_into_memory)
+- [Swift Document - ModernCollectionView](https://developer.apple.com/documentation/uikit/views_and_controls/collection_views/implementing_modern_collection_views)
+- [Swift Document - Lists in UICollectionView](https://developer.apple.com/videos/play/wwdc2020/10026) 
+- [Swift 김종권님 블로그 - NetWorkLyer - Endpoint, Provier 설계](https://ios-development.tistory.com/719)
+
