@@ -347,7 +347,7 @@ struct MovieDetailEndpoint: EndpointMakeable {
 </details>
 
 <details>
-    <summary><big>ViewController의 역할을 줄여주기 위해 Service 모델 구현 </big></summary>
+    <summary><big>ViewController의 역할을 줄여주기 위해 Service 모델 구현 </big></summary>
     
     ### :fire: ViewController의 역할을 줄여주기 위해 `BoxOfficeService`와 `ImageSearchService` 클래스 구현
 - URLSession을 통해 요청된 데이터를 ViewController에서 저장하지 않기 위해 `Service`라는 새로운 모델을 만들어줬습니다.
