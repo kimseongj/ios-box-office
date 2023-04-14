@@ -2,6 +2,13 @@
 
 # 박스오피스 🎬
 > 영화진흥위원회 API를 기반으로 박스오피스 리스트를 보여주는 프로젝트
+> 사용한 기술
+> * modernCollectionView - List Layout / Icon Layout (CompositionalLayout)
+> * JSONData Parsing - 영화진흥위원회 BoxOfficeData
+> * URLSession - Get Http메서드를 바탕으로 데이터 요청 구현
+> * CalendarView - CalendarView를 통한 날짜 선택 기능 구현
+> * NetWorkLayer - Service - Provide - Endpoint 구조 구현
+
 ---
 ## 목차 📋
 1. [팀원 소개](#1-팀원-소개)
@@ -9,7 +16,8 @@
 3. [파일 구조](#3-파일-구조)
 4. [실행화면](#4-실행화면)
 5. [트러블 슈팅](#5-트러블-슈팅)
-6. [Reference](#6-reference)
+6. [Reference](#6-Reference)
+7. [팀 회고](#7-팀-회고)
 
 ---
 
@@ -45,6 +53,11 @@
 |2023-04-05|BoxOfficeService 구현, CalenderView에서 받아온 날짜데이터 format변경|
 |2023-04-06|날짜선택 제한구현, setCalenderViewSelectionBehavior구현|
 |2023-04-07|날짜 format변경방식 String Extension에서 DateFormatter사용하는방식으로 변경|
+|2023-04-10|메인화면의 Present 방식을 Icon, List로 구현|
+|2023-04-11|Dynamic Type 구현|
+|2023-04-12|오토레이아웃 리팩토링|
+|2023-04-13|imageSearch에 cache데이터 삭제 메서드 구현|
+|2023-04-14|URLcache 삭제 메서드 구현|
     
 </details>
 
@@ -101,8 +114,14 @@ BoxOffice
 ## 4. 실행화면
 |BoxOfficeList 페이지|MovieDetail페이지|CalendarView|
 |:----:|:----:|:----:|
-|<img src="https://i.imgur.com/JZXjcNx.gif" width = 70% /> |<img src = "https://i.imgur.com/d3Xrhvu.gif" width = 70%>|<img src = "https://i.imgur.com/CP5uwZ0.gif" width = 70%>|
-|BoxOfficeAPI를 JSON파싱해 원하는 날짜의 영화리스트를 `collectionListView`로 띄워주고 있는 화면입니다|BoxOfficeList페이지에서 각각의 셀을 클릭하여 `MovieDetailView`로 이동해 해당하는 영화의 이미지와 영화정보를 화면에 띄워주는 화면입니다|우측상단 네비게이션바버튼을 이용해 날짜버튼을 클릭시 `calendarView`가 나오고 받아온 날짜데이터를 통해 BoxOfficeList를 다시 업데이트하는 화면입니다| 
+|<img src="https://i.imgur.com/JZXjcNx.gif" width = 140 /> |<img src = "https://i.imgur.com/RCm26Lw.gif" width = 140>|<img src = "https://i.imgur.com/CP5uwZ0.gif" width = 140>|
+|해당 날짜의 BoxOffice데이터를 요청하여 응답받고, JSON파싱을 통해 가공된 데이터를 영화리스트 `collectionListView`형태로 띄워주고 있는 화면입니다.|BoxOfficeList페이지에서 각각의 셀을 클릭하여 `MovieDetailView`로 이동해 해당하는 영화의 이미지와 영화정보를 화면에 띄워주는 화면입니다.|우측상단 네비게이션바버튼을 이용해 날짜버튼을 클릭시 `calendarView`가 나오고 받아온 날짜데이터를 통해 BoxOfficeList를 다시 업데이트하는 화면입니다.| 
+
+|Dynamic Type 적용|Present 방식|
+|:----:|:----:|
+|<img src="https://i.imgur.com/gY5xbLm.gif" width = 140 />|<img src="https://i.imgur.com/QdQqPMU.gif" width = 140 />|
+|BoxOfficeList 페이지와, MovieDetail페이지에 Dynamic Type을 적용시켰켜 유연한 글자 크기를 구현했습니다.|BoxOfficeList 페이지에서 List 표현방식과, Icon 표현방식으로 설정할 수 있도록 화면을 구현하였습니다.|
+
 
 </br>
 
@@ -127,7 +146,7 @@ BoxOffice
 <img src= https://i.imgur.com/8QmPtiz.png>
 
     
-</br>   
+</br> 
     
 </details>
     
@@ -160,7 +179,7 @@ URLSession.shared.dataTask(with: request) { data, response, error in
         }.resume()
 ```
     
-</details>    
+</details> 
 
 <details>
     <summary><big>ViewController에 API로 불러온 데이터 전달방법</big></summary>  
@@ -431,6 +450,103 @@ final class BoxOfficeViewController: UIViewController {
  
 </details>
     
+<details>
+    <summary><big>URLCache 잔존기한 설정 및 정책 설정 </big></summary>    
+    
+### :fire:URLCache 잔존기한 설정 - removeAllCachedResponses
+* URLCache 잔존기한 설정을 `removeAllCachedResponses()` 매서드를 활용해서 **2가지 조건** 을 통해 구현하고자했습니다.
+    * 1. viewDidLoad에 아래 `removeCacheAfter30min()`매서드를 구현해 30분간 캐시데이터가 잔존할 수 있도록하며 이후에 캐시데이터를 삭제시키는 조건입니다.
+    * 2. appdelegate - applicationWillTerminate() `removeCache()`매서드를 구현해 앱이 종료되는 시점에 캐시데이터를 삭제시키는 조건입니다.
+
+    
+```swift
+//viewDidLoad
+ func removeCacheAfter30min() {
+        DispatchQueue.main.asyncAfter(deadline: DispatchTime.now() + 1800) {
+            URLCache.shared.removeAllCachedResponses()
+            print("캐시 지워짐")
+    }
+}
+```
+
+```swift!
+//Appdelegate - applicationWillTerminate()
+ func removeCache() {
+        DispatchQueue.main.async() {
+            URLCache.shared.removeAllCachedResponses()
+            print("캐시 지워짐")
+    }
+}
+```
+* (문제점) 앱이 실행된 이후에 시간을 갖고 캐시데이터를 삭제시키는 매서드는 정상적으로 구현되는 반면에 앱이 종료되는 시점에 캐시데이터를 삭제시키는 매서드는 정상작동되지않았습니다. `applicationWillterminate()`매서드는 정상적으로 동작하는데 내부에 `removeCache`가 작동되지않았고 이를 해결하지 못했습니다.
+
+### :fire: URLCache 정책
+* URLCache의 4가지 정책중 `urlRequest.cachePolicy = .returnCacheDataElseLoad` 정책을 선택해서 캐시데이터가 있을때는 네트워킹을 허용하지않고 캐시데이터가 없을때만 네트워킹을 하도록 정책을 선택했습니다.
+* 또 `storagePolicy = .allowedInMemoryOnly`로 설정함으로써 메모리에 저장하게끔 설정해 앱이 실행종료되면 메모리캐싱 특성상 캐싱데이터가 날아게끔 설정했는데 이 또한 정상작동되지 않았습니다.
+    
+</details>
+    
+
+    
+<details>
+<summary><big>ModernCollectionView cell size 설정 </big></summary> 
+    
+### :fire:Modern CollectionView 구현 방식
+    
+|변경 전|변경 후 |
+|:----:|:----:|
+|<img src = "https://i.imgur.com/WEMwELq.png" width = 70%>|<img src="https://i.imgur.com/lmdynHb.png" width = 70% />|
+
+#### 변경 전 - NSCollectionLayoutSize로 cell - group의 사이즈를 잡아주는 상태
+* 전체적인 Cell(item)의 크기를 잡아주어 Dynamic Type을 사용할 때, Cell의 크기가 변하지 않는 문제점 발생합니다.
+```swift
+  private func setUpCompositionalLayout() -> UICollectionViewLayout {
+        let layout = UICollectionViewCompositionalLayout {
+            (sectionIndex: Int, layoutEnvironment: NSCollectionLayoutEnvironment) -> NSCollectionLayoutSection? in
+            
+            let itemSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: .fractionalHeight(1.0))
+            let item = NSCollectionLayoutItem(layoutSize: itemSize)
+            
+            item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 0, bottom: 0, trailing: 0)
+            
+            let groupHeight =  NSCollectionLayoutDimension.fractionalWidth(1/4)
+            let groupSize = NSCollectionLayoutSize(widthDimension: .fractionalWidth(1.0), heightDimension: groupHeight)
+            let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitem: item, count: 1)
+            let section = NSCollectionLayoutSection(group: group)
+            
+            return section
+        }
+        return layout
+    }
+```
+    
+
+#### 변경 후 - UICollectionViewCompositionalLayout.list()매서드 사용
+* ModernCollectionView의 Layout 중에 list라는 메서드를 사용하면 테이블뷰 형태로 생성이 가능합니다.
+* Cell들 내부 요소의 크기만큼 Cell의 크기가 정해지기 때문에 Dynamic Type을 사용하여도 문제가 생기지 않습니다.
+    
+```swift
+private func setUpCompositionalListLayout() -> UICollectionViewLayout {
+        let configuration = UICollectionLayoutListConfiguration(appearance: .plain)
+        let layout = UICollectionViewCompositionalLayout.list(using: configuration)
+        
+        return layout
+    }
+```
+</details> 
+    
+<details>
+<summary><big> CollectionView에서 선택가능한 날짜 범위설정 </big></summary> 
+
+### :fire: CalendarView에서 선택 가능한 날짜 범위 생성
+* availableDateRange라는 프로퍼티를 통해 선택 가능 날짜를 구현해주었습니다.
+* 그 과정 속에서 어제의 날짜를 가져오기 위해 `Date(timeIntervalSinceNow: -86400)`를 사용해서 어제의 날짜를 적용시켰습니다.
+```swift
+self.availableDateRange = DateInterval(start: Date(timeIntervalSinceReferenceDate: 0), end: Date(timeIntervalSinceNow: -86400))
+```
+    
+</details>
+    
     
 ## 6. Reference
 - [Swift Language Guide - URLSession](https://developer.apple.com/documentation/foundation/urlsession)
@@ -438,4 +554,14 @@ final class BoxOfficeViewController: UIViewController {
 - [Swift Document - ModernCollectionView](https://developer.apple.com/documentation/uikit/views_and_controls/collection_views/implementing_modern_collection_views)
 - [Swift Document - Lists in UICollectionView](https://developer.apple.com/videos/play/wwdc2020/10026) 
 - [Swift 김종권님 블로그 - NetWorkLyer - Endpoint, Provier 설계](https://ios-development.tistory.com/719)
+
+    
+
+## 7. 팀 회고
+    - 우리팀이 잘한 점
+        - 서로의 피드백과 의견수용이 빨라서 생각을 잘 조율하면서 프로젝트를 진행할 수 있었습니다.
+    - 우리팀의 아쉬웠던 점
+        - 프로젝트 진행시간이 일정하지 않았습니다.
+        - 생소한 개념이 많아서 진행이 더디다보니 프로젝트를 완료하지 못해서 아쉬웠습니다.
+
 
